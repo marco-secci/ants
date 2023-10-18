@@ -6,6 +6,28 @@ from datetime import datetime as dt
 import random
 
 
+# =============== #
+# ANT AGENT CLASS #
+# =============== #
+class AntAgent:
+    """
+    ## AntAgent class
+
+    ====================================
+
+    #### Description:
+
+    Creates the various ant agents that exist in an anthouse, like the Queen, workers, larvae, eggs, etc
+    and give them attributes like their lifespan, their hatching time, their task, if they're holding something, etc.
+    """
+
+    def __init__(self, x, y, agent_type):
+        self.x = x
+        self.y = y
+        self.agent_type = agent_type
+        self.has_laid_egg = False
+
+
 # ===================== #
 # ANT ENVIRONMENT CLASS #
 # ===================== #
