@@ -55,6 +55,98 @@ class AntAgent:
         self.y = y
         self.agent_type = agent_type
         self.has_laid_egg = False
+        self.incubation_time = self.calculate_incubation_time()
+
+    # ========================= #
+    # CALCULATE INCUBATION TIME #
+    # ========================= #
+    def calculate_incubation_time(self):
+        """
+        ## `calculate_incubation_time` method
+
+        ====================================
+
+        #### Description
+
+        Calculates a random incubation time for each egg and assigns it to the egg.
+        """
+        # Using a normal distribution to assign an incubation time to each egg:
+        mean_incubation_time = 10
+        std_deviation = 2
+        return max(1, int(random.normalvariate(mean_incubation_time, std_deviation)))
+
+
+# ============ #
+# LARVAE CLASS #
+# ============= #
+class Larvae(AntAgent):
+    """
+    ## `Larvae` class
+
+    ====================================
+
+    #### Description
+
+    After an Egg hatches, a Larvae will be born. This Larvae has special needs like eating
+    (for now just eating lol)
+    """
+
+    # =========== #
+    # INIT METHOD #
+    # =========== #
+    def __init__(self, x: float, y: float):
+        """
+        ## `__init__` method
+
+        ====================================
+
+        #### Description
+
+        Defines how quickly the larvae gets hungry. It can ask for `3` to `5` meals a week
+
+        ====================================
+
+        #### Parameters
+
+        same as superclass
+        """
+        super().__init__(x, y, "Larvae")
+        # Defining how hungry is this larvae:
+        self.feeding_needs = random.randint(2, 4)
+        # Indicating how long ago the larvae ate:
+        self.days_since_last_meal = 0
+
+    # =========== #
+    # FEED METHOD #
+    # =========== #
+    def feed(self):
+        """
+        ## `feed` method
+
+        ====================================
+
+        #### Description
+
+        If a Larvae is fed, today is the day of its last meal, so the according
+        variable will be set to 0.
+        """
+        self.days_since_last_meal = 0
+
+    # ================ #
+    # IS HUNGRY METHOD #
+    # ================ #
+    def is_hungry(self):
+        """
+        `is_hungry` method
+
+        ====================================
+
+        #### Description
+
+        Returns `True` if the Larvae is hungry, `False` if it's not, according to how long
+        ago was its last meal.
+        """
+        return self.days_since_last_meal >= self.feeding_needs
 
 
 # ===================== #
@@ -153,22 +245,93 @@ class AntEnvironment:
         #### - `y`: `float`
             `y` coordinate of the territory that will be checked for expansion
         """
-        # Simulate the queen expanding her territory
         if self.grid[x, y] is None:
+            # If there's nothing on the selected square, add a Queen Agent
+            # at that coordinates:
             self.add_agent(x, y, "Queen")
         elif self.grid[x, y].agent_type == "Egg":
+            # If there's already an Egg Agent there, mark the square as such:
             self.grid[x, y].has_laid_egg = True
+
+    # ================= #
+    # HATCH EGGS METHOD #
+    # ================= #
+    def hatch_eggs(self):
+        """
+        ## `hatch_eggs` method
+
+        ====================================
+
+        #### Description
+
+        When run, this scripts subtracts a day from the hatching time remaining to every Egg agent
+        that is eligible for it.
+
+        At the actual state, every egg will be eligible for hatching, but
+        later in development the idea is to check if an Egg has eaten in the last `x` days, if it
+        has been protected, and adding a layer of randomness to its survival (like one in some
+        quantity dies for no reason).
+        """
+        # Searching each square of the grid for eggs:
+        for x in range(self.width):
+            for y in range(self.height):
+                # Assume there's an agent everywhere - this will be verified later:
+                agent = self.grid[x, y]
+                if isinstance(agent, AntAgent) and agent.agent_type == "Egg":
+                    if agent.incubation_time > 0:
+                        agent.incubation_time -= 1
+                    else:
+                        # The egg hatched. Now there's a Larvae agent in its place.
+                        self.grid[x, y] = "Larvae"
+
+    # ================== #
+    # FEED LARVAE METHOD #
+    # ================== #
+    def feed_larvae(self):
+        """
+        ## `feed_larvae` method
+
+        ====================================
+
+        #### Description
+
+        When run, the script resets to `0` the days since the last meal of every Larvae agent.
+
+        For now it's done using a simple function, but later this will take into consideration food
+        stocks, workers available to feed Larvae, etc.
+        """
+        # Checking the whole grid for larvae to feed:
+        for x in range(self.width):
+            for y in range(self.height):
+                agent = self.grid[x, y]
+                # If it finds a Larvae agent, it gets fed:
+                if isinstance(agent, Larvae):
+                    if agent.is_hungry():
+                        agent.feed()
 
     # ============== #
     # DISPLAY METHOD #
     # ============== #
     def display(self):
+        """
+        ## `display` method
+
+        ====================================
+
+        #### Description
+
+        Prints a grid displaying territory occupation and `Agent` presence.
+        """
         for row in self.grid:
+            # Creating a str that will simulate the row of the grid, in order
+            # to be able to print it:
             row_str = ""
             for cell in row:
+                # If nothing, print a 0 (add a space to the str):
                 if cell is None:
                     row_str += " "
-                elif isinstance(cell, AntAgent):
+                # If there's an agent, print the first letter of the Agent type:
+                elif isinstance(cell, (AntAgent, Larvae)):
                     row_str += cell.agent_type[0]
                 else:
                     row_str += str(cell)

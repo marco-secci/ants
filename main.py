@@ -17,6 +17,14 @@ egg_positions = [
 for egg_x, egg_y in egg_positions:
     environment.add_agent(egg_x, egg_y, "Egg")
 
-# Display environment
 
-environment.display()
+# =============== #
+# SIMULATION LOOP #
+# =============== #
+
+# Display environment
+for _ in range(20):
+    environment.hatch_eggs()
+    environment.feed_larvae()
+    environment.display()
+    print("\n")
