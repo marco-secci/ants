@@ -1,6 +1,0 @@
-numpy
-pandas
-random
-matplotlib
-datetime
-statistics
