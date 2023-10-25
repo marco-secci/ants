@@ -1,21 +1,30 @@
+# ======= #
+# IMPORTS #
+# ======= #
 import numpy as np
 
-class Pheromone:
+from ant import *
+from antcolony import *
+from environment import *
 
-	# =========== #
+
+# =============== #
+# PHEROMONE CLASS #
+# =============== #
+class Pheromone:
+    # =========== #
     # INIT METHOD #
     # =========== #
-	def __init__(self, env, type, evaporation_rate=0.1):
+    def __init__(self, env: Environment, type: str, evaporation_rate=0.2):
         self.env = env
         self.type = type  # 'food' or 'home' for example
         self.evaporation_rate = evaporation_rate
         self.pheromone_grid = np.zeros((env.height, env.width))
 
-
     # ============== #
     # DEPOSIT METHOD #
     # ============== #
-    def deposit(self, x, y, amount):
+    def deposit(self, x, y, amount: float):
         # Deposit pheromone at a specific location (x, y) with a specified amount
         self.pheromone_grid[y, x] += amount
 
@@ -24,7 +33,7 @@ class Pheromone:
     # ================ #
     def evaporate(self):
         # Apply evaporation to pheromones in the grid
-        self.pheromone_grid *= (1 - self.evaporation_rate)
+        self.pheromone_grid *= 1 - self.evaporation_rate
 
     # =================== #
     # GET STRENGHT METHOD #
