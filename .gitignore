@@ -2,7 +2,7 @@
 __pycache__/ants.cpython-311.pyc
 .vscode 
 test.py
-ants sim/Library/
-ants sim/UserSettings/
-ants sim/Temp/
-ants sim/Logs/
+Unity/ants sim/Library/
+Unity/ants sim/UserSettings/
+Unity/ants sim/Temp/
+Unity/ants sim/Logs/
